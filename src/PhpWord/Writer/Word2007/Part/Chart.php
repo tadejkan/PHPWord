@@ -151,7 +151,7 @@ class Chart extends AbstractPart
 
         //Chart legend
         if ($showLegend) {
-            $xmlWriter->writeRaw('<c:legend><c:legendPos val="' . $legendPosition . '"/></c:legend>');
+            $xmlWriter->writeRaw('<c:legend><c:legendPos val="' . $legendPosition . '"/><c:overlay val="0"/></c:legend>');
         }
 
         $xmlWriter->startElement('c:plotArea');
@@ -162,6 +162,8 @@ class Chart extends AbstractPart
         $chartType .= $style->is3d() && !isset($this->options['no3d']) ? '3D' : '';
         $chartType .= 'Chart';
         $xmlWriter->startElement("c:{$chartType}");
+        
+        $xmlWriter->writeElementBlock('c:gapWidth', 'val', 150);
 
         $xmlWriter->writeElementBlock('c:varyColors', 'val', $this->options['colors']);
         if ($type == 'area') {
@@ -381,7 +383,20 @@ class Chart extends AbstractPart
             $xmlWriter->writeElementBlock('c:crosses', 'val', 'autoZero');
         }
         if (isset($this->options['radar']) || ($type == 'cat' && $style->showGridX()) || ($type == 'val' && $style->showGridY())) {
-            $xmlWriter->writeElement('c:majorGridlines');
+            $xmlWriter->startElement('c:majorGridlines');
+            if ($axisType == 'c:valAx') {
+            	$xmlWriter->writeRaw('<c:spPr><a:ln w="3175"><a:solidFill><a:srgbClr val="aaaaaa"/></a:solidFill></a:ln></c:spPr>');
+            }
+            else {
+            	$xmlWriter->writeRaw('<c:spPr><a:ln w="3175"></a:ln></c:spPr>');
+            }
+            $xmlWriter->endElement(); // c:majorGridlines
+            
+            if ($axisType == 'c:valAx') {
+            //	$xmlWriter->startElement('c:minorGridlines');
+            //	$xmlWriter->endElement(); // c:minorGridlines
+                $xmlWriter->writeElementBlock('c:majorUnit', 'val', 5);
+            }
         }
 
         $xmlWriter->startElement('c:scaling');
