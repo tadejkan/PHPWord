@@ -45,6 +45,7 @@ use ReflectionClass;
  * @method Line addLine(mixed $lineStyle = null)
  * @method Shape addShape(string $type, mixed $style = null)
  * @method Chart addChart(string $type, array $categories, array $values, array $style = null, $seriesName = null)
+ * @method ComboChart addComboChart(array $types, array $categories, array(array) $values, array $style = null, $seriesName = null)
  * @method FormField addFormField(string $type, mixed $fStyle = null, mixed $pStyle = null)
  * @method SDT addSDT(string $type)
  * @method \PhpOffice\PhpWord\Element\OLEObject addObject(string $source, mixed $style = null) deprecated, use addOLEObject instead
@@ -87,7 +88,7 @@ abstract class AbstractContainer extends AbstractElement
             'ListItem', 'ListItemRun', 'Table', 'Image', 'Object', 'OLEObject',
             'Footnote', 'Endnote', 'CheckBox', 'TextBox', 'Field',
             'Line', 'Shape', 'Title', 'TOC', 'PageBreak',
-            'Chart', 'FormField', 'SDT', 'Comment',
+            'Chart', 'FormField', 'SDT', 'Comment', 'ComboChart',
         ];
         $functions = [];
         foreach ($elements as $element) {
@@ -254,6 +255,7 @@ abstract class AbstractContainer extends AbstractElement
             'TOC' => ['Section'],
             'PageBreak' => ['Section'],
             'Chart' => ['Section', 'Cell'],
+            'ComboChart' => ['Section', 'Cell'],
         ];
 
         // Special condition, e.g. preservetext can only exists in cell when

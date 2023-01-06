@@ -73,6 +73,7 @@ class Word2007 extends AbstractWriter implements WriterInterface
             'Footnotes' => '',
             'Endnotes' => '',
             'Chart' => '',
+            'ComboChart' => '',
         ];
         foreach (array_keys($this->parts) as $partName) {
             $partClass = static::class . '\\Part\\' . $partName;
@@ -280,26 +281,31 @@ class Word2007 extends AbstractWriter implements WriterInterface
     {
         $phpWord = $this->getPhpWord();
 
-        $collection = $phpWord->getCharts();
         $index = 0;
-        if ($collection->countItems() > 0) {
-            /** @var \PhpOffice\PhpWord\Element\Chart $chart */
-            foreach ($collection->getItems() as $chart) {
-                ++$index;
-                ++$rId;
-                $filename = "charts/chart{$index}.xml";
+        
+        foreach ([ [ $phpWord->getCharts(), 'Chart' ], [ $phpWord->getCombocharts(), 'ComboChart' ] ] as $item) {
+            $collection  = $item[0];
+            $writer_type = $item[1];
+            
+            if ($collection->countItems() > 0) {
+                /** @var \PhpOffice\PhpWord\Element\Chart $chart */
+                foreach ($collection->getItems() as $chart) {
+                    ++$index;
+                    ++$rId;
+                    $filename = "charts/chart{$index}.xml";
 
-                // ContentTypes.xml
-                $this->contentTypes['override']["/word/{$filename}"] = 'chart';
+                    // ContentTypes.xml
+                    $this->contentTypes['override']["/word/{$filename}"] = 'chart';
 
-                // word/_rels/document.xml.rel
-                $this->relationships[] = ['target' => $filename, 'type' => 'chart', 'rID' => $rId];
+                    // word/_rels/document.xml.rel
+                    $this->relationships[] = ['target' => $filename, 'type' => 'chart', 'rID' => $rId];
 
-                // word/charts/chartN.xml
-                $chart->setRelationId($rId);
-                $writerPart = $this->getWriterPart('Chart');
-                $writerPart->setElement($chart);
-                $zip->addFromString("word/{$filename}", $writerPart->write());
+                    // word/charts/chartN.xml
+                    $chart->setRelationId($rId);
+                    $writerPart = $this->getWriterPart($writer_type);
+                    $writerPart->setElement($chart);
+                    $zip->addFromString("word/{$filename}", $writerPart->write());
+                }
             }
         }
     }
