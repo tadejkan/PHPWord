@@ -161,12 +161,14 @@ class ComboChart extends AbstractPart
         foreach ($types as $type_idx => $type) {
             $this->options = $this->types[$type];
             
+            $extraOptions = $this->element->extraOptionsForTypes[$type_idx] ?? [];
+            
             $chartType = $this->options['type'];
             $chartType .= $style->is3d() && !isset($this->options['no3d']) ? '3D' : '';
             $chartType .= 'Chart';
             $xmlWriter->startElement("c:{$chartType}");
             
-            $xmlWriter->writeElementBlock('c:gapWidth', 'val', 150);
+            $xmlWriter->writeElementBlock('c:gapWidth', 'val', '' . ($extraOptions['gapWidth'] ?? 150));
 
             $xmlWriter->writeElementBlock('c:varyColors', 'val', $this->options['colors']);
             if ($type == 'area') {
@@ -287,6 +289,22 @@ class ComboChart extends AbstractPart
                         $xmlWriter->endElement(); // c:dPt
                         ++$valueIndex;
                     }
+                }
+                else if (array_key_exists('dashed', $seriesItem['extra'])) {
+                    $valueIndex = 0;
+                    $xmlWriter->startElement('c:dPt');
+                    $xmlWriter->writeElementBlock('c:idx', 'val', $valueIndex);
+                    $xmlWriter->startElement('c:spPr');
+                    $xmlWriter->writeElement('a:noFill');
+                    $xmlWriter->startElement('a:ln');
+                    $xmlWriter->startElement('a:solidFill');
+                    $xmlWriter->writeElementBlock('a:srgbClr', 'val', $seriesItem['extra']['dashed']);
+                    $xmlWriter->endElement(); // a:solidFill
+                    $xmlWriter->writeElementBlock('a:prstDash', 'val', 'dash');
+                    $xmlWriter->endElement(); // a:ln
+                    $xmlWriter->endElement(); // c:spPr
+                    $xmlWriter->endElement(); // c:dPt
+                    ++$valueIndex;
                 }
             }
 

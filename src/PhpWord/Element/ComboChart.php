@@ -53,6 +53,8 @@ class ComboChart extends AbstractElement
      * @var \PhpOffice\PhpWord\Style\Chart
      */
     private $style;
+    
+    public $extraOptionsForTypes;
 
     /**
      * Create new instance.
@@ -60,10 +62,11 @@ class ComboChart extends AbstractElement
      * @param array $types
      * @param array $style
      */
-    public function __construct($types, $style = null)
+    public function __construct($types, $style = null, $extraOptionsForTypes = [])
     {
         $this->setTypes($types);
         $this->style = $this->setNewStyle(new ChartStyle(), $style, true);
+        $this->extraOptionsForTypes = $extraOptionsForTypes;
     }
 
     /**
@@ -99,12 +102,13 @@ class ComboChart extends AbstractElement
      * @param array(array) $values
      * @param null|mixed $name
      */
-    public function addSeries($idx, $categories, $values, $name = null): void
+    public function addSeries($idx, $categories, $values, $name = null, $extra = []): void
     {
         $this->series[$idx][] = [
             'categories' => $categories,
             'values' => $values,
             'name' => $name,
+            'extra' => $extra,
         ];
     }
 
