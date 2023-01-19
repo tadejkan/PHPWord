@@ -250,6 +250,20 @@ class ComboChart extends AbstractPart
                 $xmlWriter->endElement(); // c:strCache
                 $xmlWriter->endElement(); // c:strRef
                 $xmlWriter->endElement(); // c:tx
+                
+                if (array_key_exists('dashed', $seriesItem['extra'])) {
+                    $xmlWriter->startElement('c:spPr');
+                        $xmlWriter->startElement('a:solidFill');
+                            $xmlWriter->writeElementBlock('a:srgbClr', 'val', 'ffffff');
+                        $xmlWriter->endElement(); // a:solidFill
+                        $xmlWriter->startElement('a:ln');
+                            $xmlWriter->startElement('a:solidFill');
+                                $xmlWriter->writeElementBlock('a:srgbClr', 'val', $seriesItem['extra']['dashed']);
+                            $xmlWriter->endElement(); // a:solidFill
+                            $xmlWriter->writeElementBlock('a:prstDash', 'val', 'dash');
+                        $xmlWriter->endElement(); // a:ln
+                    $xmlWriter->endElement(); // c:spPr
+                }
             }
 
             // The c:dLbls was added to make word charts look more like the reports in SurveyGizmo
@@ -297,9 +311,33 @@ class ComboChart extends AbstractPart
                     $xmlWriter->startElement('c:spPr');
                     $xmlWriter->writeElement('a:noFill');
                     $xmlWriter->startElement('a:ln');
+                    
+                    if ($seriesItem['extra']['dashed-just-line'] ?? false) {
+                        $xmlWriter->startElement('a:gradFill');
+                            $xmlWriter->startElement('a:gsLst');
+                                $xmlWriter->startElement('a:gs');
+                                    $xmlWriter->writeAttribute('pos', 0);
+                                    $xmlWriter->writeElementBlock('a:srgbClr', 'val', $seriesItem['extra']['dashed']);
+                                $xmlWriter->endElement(); // a:gs
+                                $xmlWriter->startElement('a:gs');
+                                    $xmlWriter->writeAttribute('pos', 1000);
+                                    $xmlWriter->startElement('a:srgbClr');
+                                        $xmlWriter->writeAttribute('val', $seriesItem['extra']['dashed']);
+                                        $xmlWriter->writeElementBlock('a:alpha', 'val', 0);
+                                    $xmlWriter->endElement(); // a:srgbClr
+                                $xmlWriter->endElement(); // a:gs
+                            $xmlWriter->endElement(); // a:gsLst
+                            $xmlWriter->startElement('a:lin');
+                                $xmlWriter->writeAttribute('ang', 5400000);
+                                $xmlWriter->writeAttribute('scaled', 0);
+                            $xmlWriter->endElement(); // a:lin
+                        $xmlWriter->endElement(); // a:gradFill
+                    }
+                    else {
                     $xmlWriter->startElement('a:solidFill');
                     $xmlWriter->writeElementBlock('a:srgbClr', 'val', $seriesItem['extra']['dashed']);
                     $xmlWriter->endElement(); // a:solidFill
+                    }
                     $xmlWriter->writeElementBlock('a:prstDash', 'val', 'dash');
                     $xmlWriter->endElement(); // a:ln
                     $xmlWriter->endElement(); // c:spPr
