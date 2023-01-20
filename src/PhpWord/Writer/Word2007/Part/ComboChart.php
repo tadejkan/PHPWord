@@ -320,7 +320,7 @@ class ComboChart extends AbstractPart
                                     $xmlWriter->writeElementBlock('a:srgbClr', 'val', $seriesItem['extra']['dashed']);
                                 $xmlWriter->endElement(); // a:gs
                                 $xmlWriter->startElement('a:gs');
-                                    $xmlWriter->writeAttribute('pos', 1000);
+                                    $xmlWriter->writeAttribute('pos', 5000);
                                     $xmlWriter->startElement('a:srgbClr');
                                         $xmlWriter->writeAttribute('val', $seriesItem['extra']['dashed']);
                                         $xmlWriter->writeElementBlock('a:alpha', 'val', 0);
